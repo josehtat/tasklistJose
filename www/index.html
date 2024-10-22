@@ -1,26 +1,148 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.7.1.js"
-        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <title>Task List</title>
+    <title>Lista de Tareas con jQuery UI</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        body {
+            font-family: 'Verdana', sans-serif;
+            margin: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #addTaskButton {
+            font-size: 16px;
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            cursor: pointer;
+            background-color: #e7e7e7;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+        }
+
+        #addTaskButton:hover {
+            background-color: #d7d7d7;
+        }
+
+        .task-accordion {
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .removeTaskButton {
+            background-color: #e7e7e7;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            float: right;
+        }
+
+        .removeTaskButton:hover {
+            background-color: #d7d7d7;
+        }
+
+        dialog {
+            border: none;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #submitTaskButton {
+            padding: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #bbb;
+            background-color: #e7e7e7;
+            border-radius: 5px;
+        }
+
+        #submitTaskButton:hover {
+            background-color: #d7d7d7;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>TASK LIST</h1>
-    <ul>
-        <li>Exemple tasca 1</li>
-    </ul>
 
-    <script type="text/javascript">
-        var tasca = prompt("Tasca?")
-        // creem element jQuery
-        var jquery_elem = $("<li>"+tasca+"</li>");
-        // l'afegim a una llista de la nostra pàgina
-        $("ul").append(jquery_elem);
+    <div class="header">
+        <h1>LISTA DE TAREAS</h1>
+        <button id="addTaskButton">+</button>
+    </div>
+
+    <div id="taskList" class="task-accordion"></div>
+
+    <div id="taskModal" title="addTask" style="display:none;">
+        <div class="input-container">
+            <input type="text" id="taskInputField">
+            <button id="submitTaskButton">Agregar</button>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            $("#taskList").accordion({
+                collapsible: true,
+                active: false,
+                heightStyle: "content"
+            });
+
+            $("#addTaskButton").on("click", function () {
+                $("#taskModal").dialog({
+                    modal: true,
+                    close: function () {
+                        $("#taskInputField").val(''); 
+                    }
+                });
+            });
+
+            $("#submitTaskButton").on("click", function () {
+                const taskText = $("#taskInputField").val().trim();
+
+                if (taskText !== '') {
+                    const taskHeader = $("<h3></h3>").text(taskText).addClass("accordion-header");
+                    const taskDetails = $("<div></div>").addClass("accordion-content").append(
+                        $("<button class='removeTaskButton'>x</button>").on("click", function () {
+                            taskHeader.remove();
+                            taskDetails.remove();
+                            $("#taskList").accordion("refresh");
+                        })
+                    ).append(" Detalles adicionales sobre esta tarea pueden ir aquí.");
+
+                    $("#taskList").append(taskHeader).append(taskDetails);
+                    $("#taskList").accordion("refresh");
+
+                    $("#taskModal").dialog("close");
+                }
+            });
+        });
     </script>
+
 </body>
+
 </html>
