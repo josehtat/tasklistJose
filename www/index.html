@@ -55,6 +55,21 @@
             background-color: #d7d7d7;
         }
 
+        .editTaskButton {
+            background-color: #e7e7e7;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            float: right;
+            margin-right: 10px;
+        }
+
+        .editTaskButton:hover {
+            background-color: #d7d7d7;
+        }
+
         dialog {
             border: none;
             padding: 20px;
@@ -91,7 +106,7 @@
 <body>
 
     <div class="header">
-        <h1>LISTA DE TAREAS</h1>
+        <h1>TASK LIST</h1>
         <button id="addTaskButton">+</button>
     </div>
 
@@ -100,7 +115,7 @@
     <div id="taskModal" title="addTask" style="display:none;">
         <div class="input-container">
             <input type="text" id="taskInputField">
-            <button id="submitTaskButton">Agregar</button>
+            <button id="submitTaskButton">ADD</button>
         </div>
     </div>
 
@@ -116,23 +131,29 @@
                 $("#taskModal").dialog({
                     modal: true,
                     close: function () {
-                        $("#taskInputField").val(''); 
+                        $("#taskInputField").val('');
                     }
                 });
             });
-
             $("#submitTaskButton").on("click", function () {
                 const taskText = $("#taskInputField").val().trim();
 
                 if (taskText !== '') {
                     const taskHeader = $("<h3></h3>").text(taskText).addClass("accordion-header");
-                    const taskDetails = $("<div></div>").addClass("accordion-content").append(
-                        $("<button class='removeTaskButton'>x</button>").on("click", function () {
-                            taskHeader.remove();
-                            taskDetails.remove();
-                            $("#taskList").accordion("refresh");
-                        })
-                    ).append(" Detalles adicionales sobre esta tarea pueden ir aquí.");
+                    const taskDetails = $("<div></div>").addClass("accordion-content");
+                    const removeButton = $("<button class='removeTaskButton'>Remove</button>").on("click", function () {
+                        taskHeader.remove();
+                        taskDetails.remove();
+                        $("#taskList").accordion("refresh");
+                    });
+                    const editButton = $("<button class='editTaskButton'>Edit</button>").on("click", function () {
+                        const editText = prompt("Insert the new text:", taskText);
+                        if (editText !== null) {
+                            taskHeader.text(editText);
+                        }
+                    });
+
+                    taskDetails.append(removeButton).append(editButton);
 
                     $("#taskList").append(taskHeader).append(taskDetails);
                     $("#taskList").accordion("refresh");
@@ -141,6 +162,7 @@
                 }
             });
         });
+
     </script>
 
 </body>
