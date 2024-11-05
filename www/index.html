@@ -121,11 +121,13 @@
 
     <script>
         $(function () {
+            // Inicializar el acordeón y cargar las tareas desde localStorage
             $("#taskList").accordion({
                 collapsible: true,
                 active: false,
                 heightStyle: "content"
             });
+            loadTasks();
 
             $("#addTaskButton").on("click", function () {
                 $("#taskModal").dialog({
@@ -135,34 +137,53 @@
                     }
                 });
             });
+
             $("#submitTaskButton").on("click", function () {
                 const taskText = $("#taskInputField").val().trim();
-
                 if (taskText !== '') {
-                    const taskHeader = $("<h3></h3>").text(taskText).addClass("accordion-header");
-                    const taskDetails = $("<div></div>").addClass("accordion-content");
-                    const removeButton = $("<button class='removeTaskButton'>Remove</button>").on("click", function () {
-                        taskHeader.remove();
-                        taskDetails.remove();
-                        $("#taskList").accordion("refresh");
-                    });
-                    const editButton = $("<button class='editTaskButton'>Edit</button>").on("click", function () {
-                        const editText = prompt("Insert the new text:", taskText);
-                        if (editText !== null) {
-                            taskHeader.text(editText);
-                        }
-                    });
-
-                    taskDetails.append(removeButton).append(editButton);
-
-                    $("#taskList").append(taskHeader).append(taskDetails);
-                    $("#taskList").accordion("refresh");
-
+                    addTask(taskText);
+                    saveTasks();
                     $("#taskModal").dialog("close");
                 }
             });
-        });
 
+            function addTask(taskText) {
+                const taskHeader = $("<h3></h3>").text(taskText).addClass("accordion-header");
+                const taskDetails = $("<div></div>").addClass("accordion-content");
+
+                const removeButton = $("<button class='removeTaskButton'>Remove</button>").on("click", function () {
+                    taskHeader.remove();
+                    taskDetails.remove();
+                    $("#taskList").accordion("refresh");
+                    saveTasks();
+                });
+
+                const editButton = $("<button class='editTaskButton'>Edit</button>").on("click", function () {
+                    const editText = prompt("Insert the new text:", taskText);
+                    if (editText !== null && editText.trim() !== "") {
+                        taskHeader.text(editText);
+                        saveTasks();
+                    }
+                });
+
+                taskDetails.append(removeButton).append(editButton);
+                $("#taskList").append(taskHeader).append(taskDetails);
+                $("#taskList").accordion("refresh");
+            }
+
+            function saveTasks() {
+                const tasks = [];
+                $("#taskList h3").each(function () {
+                    tasks.push($(this).text());
+                });
+                localStorage.setItem("tasks", JSON.stringify(tasks));
+            }
+
+            function loadTasks() {
+                const storedTasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+                storedTasks.forEach(taskText => addTask(taskText));
+            }
+        });
     </script>
 
 </body>
